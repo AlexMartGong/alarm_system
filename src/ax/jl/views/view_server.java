@@ -6,8 +6,7 @@ import com.mysql.cj.jdbc.result.ResultSetMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class view_server extends javax.swing.JFrame {
@@ -170,13 +169,19 @@ public class view_server extends javax.swing.JFrame {
     }//GEN-LAST:event_lbtnAgregarMouseClicked
 
     private void lbtnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbtnEliminarMouseClicked
-        System.out.println("Eliminar");
-        cargarTable();
+
+        int fila = tableAlarm.getSelectedRow();
+
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Por favor, seleccione una alarma.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            int id = Integer.parseInt(tableAlarm.getValueAt(fila, 0).toString());
+            operations.deleteDB(id);
+            cargarTable();
+        }
+
     }//GEN-LAST:event_lbtnEliminarMouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -236,18 +241,11 @@ public class view_server extends javax.swing.JFrame {
         DefaultTableModel modelTable = (DefaultTableModel) tableAlarm.getModel();
         modelTable.setRowCount(0);
 
-        String sql;
-        PreparedStatement ps;
-        ResultSet rs;
-        ResultSetMetaData rsmd;
-        int columnas;
+        String sql = "SELECT * FROM alarms";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-        try {
-            sql = "SELECT * FROM alarms";
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-            rsmd = (ResultSetMetaData) rs.getMetaData();
-            columnas = rsmd.getColumnCount();
+            ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
+            int columnas = rsmd.getColumnCount();
 
             while (rs.next()) {
                 Object[] fila = new Object[columnas];
@@ -256,11 +254,9 @@ public class view_server extends javax.swing.JFrame {
                 }
                 modelTable.addRow(fila);
             }
-
         } catch (SQLException e) {
             System.out.println(e.toString());
         }
-
     }
 
 }
