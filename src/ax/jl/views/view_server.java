@@ -1,9 +1,24 @@
 package ax.jl.views;
 
+import ax.jl.connection.DatabaseConnection;
+import ax.jl.dboperations.OperationsDB;
+import com.mysql.cj.jdbc.result.ResultSetMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+
 public class view_server extends javax.swing.JFrame {
+
+    OperationsDB operations = new OperationsDB();
+    DatabaseConnection conne = new DatabaseConnection();
+    java.sql.Connection conn = conne.connectMySQL();
 
     public view_server() {
         initComponents();
+        cargarTable();
     }
 
     @SuppressWarnings("unchecked")
@@ -145,11 +160,18 @@ public class view_server extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lbtnAgregarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbtnAgregarMouseClicked
-        System.out.println("Agregar");
+        int hour, minute;
+        hour = Integer.parseInt(txtHour.getText());
+        minute = Integer.parseInt(txtMinute.getText());
+
+        operations.insertDB(0, hour, minute);
+        clean();
+        cargarTable();
     }//GEN-LAST:event_lbtnAgregarMouseClicked
 
     private void lbtnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbtnEliminarMouseClicked
         System.out.println("Eliminar");
+        cargarTable();
     }//GEN-LAST:event_lbtnEliminarMouseClicked
 
     /**
@@ -203,4 +225,42 @@ public class view_server extends javax.swing.JFrame {
     private javax.swing.JTextField txtHour;
     private javax.swing.JTextField txtMinute;
     // End of variables declaration//GEN-END:variables
+
+    private void clean() {
+        txtHour.setText("");
+        txtMinute.setText("");
+    }
+
+    private void cargarTable() {
+
+        DefaultTableModel modelTable = (DefaultTableModel) tableAlarm.getModel();
+        modelTable.setRowCount(0);
+
+        String sql;
+        PreparedStatement ps;
+        ResultSet rs;
+        ResultSetMetaData rsmd;
+        int columnas;
+
+        try {
+            sql = "SELECT * FROM alarms";
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            rsmd = (ResultSetMetaData) rs.getMetaData();
+            columnas = rsmd.getColumnCount();
+
+            while (rs.next()) {
+                Object[] fila = new Object[columnas];
+                for (int indice = 0; indice < columnas; indice++) {
+                    fila[indice] = rs.getObject(indice + 1);
+                }
+                modelTable.addRow(fila);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.toString());
+        }
+
+    }
+
 }
