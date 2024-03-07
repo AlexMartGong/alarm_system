@@ -1,5 +1,6 @@
 package ax.jl.views;
 
+import ax.jl.connection.DatabaseConnection;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -16,10 +17,15 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
 
 public class Cliente extends javax.swing.JFrame {
+
+    DatabaseConnection conne = new DatabaseConnection();
+    java.sql.Connection conn = conne.connectMySQL();
+
     private ArrayList<Alarma> listaAlarmas;
-    private Timer timer; 
+    private Timer timer;
     private Socket socketServidor;
     private ArrayList<JPanel> listaPanelesAlarmas;
 
@@ -86,7 +92,7 @@ public class Cliente extends javax.swing.JFrame {
     }
 
     private void conectarAServidor() {
-       
+
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
@@ -113,21 +119,22 @@ public class Cliente extends javax.swing.JFrame {
     }
 
     private void recibirAlarmaDesdeServidor(Socket servidor) throws IOException {
-      DataInputStream leer = new DataInputStream(servidor.getInputStream());
-    String mensaje = leer.readUTF();
-    String[] partes = mensaje.split(",");
-    String accion = partes[0];
-    String alarma = partes[1];
-    if (accion.equals("eliminar")) {
-        eliminarAlarmaCliente(alarma);
-    } else if (accion.equals("agregar")) { // Cambio aquí
-        // Agregar la alarma a la lista
-        listaAlarmas.add(new Alarma(alarma, true));
+        DataInputStream leer = new DataInputStream(servidor.getInputStream());
+        String mensaje = leer.readUTF();
+        String[] partes = mensaje.split(",");
+        String accion = partes[0];
+        String alarma = partes[1];
+        if (accion.equals("eliminar")) {
+            eliminarAlarmaCliente(alarma);
+        } else if (accion.equals("agregar")) { // Cambio aquí
+            // Agregar la alarma a la lista
+            listaAlarmas.add(new Alarma(alarma, true));
+        }
+
     }
 
-}
+    private static class Alarma {
 
- private static class Alarma {
         private String hora;
         private boolean activa;
 
@@ -148,7 +155,7 @@ public class Cliente extends javax.swing.JFrame {
             this.activa = activa;
         }
     }
-  
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -164,7 +171,7 @@ public class Cliente extends javax.swing.JFrame {
         lblreloj = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblAlarms = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 51, 102));
@@ -210,7 +217,7 @@ public class Cliente extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Arial", 1, 32)); // NOI18N
         jLabel1.setText("Hora Actual Sistema");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblAlarms.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -229,7 +236,7 @@ public class Cliente extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblAlarms);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -306,10 +313,12 @@ public class Cliente extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private java.awt.Label label2;
     private javax.swing.JLabel lblreloj;
     private java.awt.Panel panel1;
     private java.awt.Panel panel2;
+    private javax.swing.JTable tblAlarms;
     // End of variables declaration//GEN-END:variables
+
+
 }
