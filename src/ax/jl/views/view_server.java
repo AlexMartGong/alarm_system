@@ -38,6 +38,7 @@ public class view_server extends javax.swing.JFrame {
         lbtnAgregar = new javax.swing.JLabel();
         pbtnEliminar = new javax.swing.JPanel();
         lbtnEliminar = new javax.swing.JLabel();
+        btnStart = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLocationByPlatform(true);
@@ -144,6 +145,15 @@ public class view_server extends javax.swing.JFrame {
 
         jPanel1.add(pbtnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 110, -1, 30));
 
+        btnStart.setText("Start");
+        btnStart.setBorder(null);
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 210, 100, 40));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -182,6 +192,14 @@ public class view_server extends javax.swing.JFrame {
 
     }//GEN-LAST:event_lbtnEliminarMouseClicked
 
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+
+        int fila = tableAlarm.getSelectedRow();
+        int id = Integer.parseInt(tableAlarm.getValueAt(fila, 0).toString());
+        operations.getAlarmTime(id);
+
+    }//GEN-LAST:event_btnStartActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -215,6 +233,7 @@ public class view_server extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnStart;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
